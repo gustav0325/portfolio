@@ -1,0 +1,459 @@
+/*
+ * Geometria do Hero — frame "Hero" do Figma (1440 × 1175) como REFERÊNCIA.
+ *
+ * A seção ocupa a tela (100svh). As coordenadas do Figma são adaptadas
+ * considerando largura E altura disponíveis, para que a composição inteira
+ * caiba na tela como no frame:
+ *   --sx / --sy → 1px do Figma no eixo X / Y da tela
+ *   --s         → min(sx, sy): escala da composição (o frame "encaixado")
+ *
+ * - Prédio e título: escala --s, centralizados e alinhados pela base, para
+ *   manter a relação exata do Figma (a torre sob "Portfólio").
+ * - UI (redes, texto, indicador): horizontal proporcional às bordas,
+ *   vertical alinhado pela base como o prédio, tamanhos em
+ *   --s. Em telas mais largas que o frame isso equivale a y × --sy.
+ * - Céu e nuvens (camadas de fundo, de borda a borda): cada uma usa a menor
+ *   escala que cobre a largura, ancorada num ponto de referência do Figma.
+ * A sobra das imagens originais além da tela é a safe area do parallax.
+ * < 768px: adaptação mobile (ver final do arquivo).
+ */
+/*
+ * Trecho de scroll do parallax: o Hero fica sticky dentro deste wrapper
+ * enquanto as camadas se movem; depois sobe com a página. As alturas vêm de
+ * HERO_SCROLL (heroParallax.ts), via --track-h / --track-h-mobile.
+ */
+.track {
+  position: relative;
+  height: var(--track-h, 200svh);
+}
+
+.hero {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  container-type: size;
+  background: var(--background);
+
+  --sx: calc(100cqw / 1440);
+  --sy: calc(100cqh / 1175);
+  --s: min(var(--sx), var(--sy));
+  /* Tamanhos da UI usam a escala da composição. */
+  --u: var(--s);
+}
+
+/* ---------- Camadas de arte (independentes, imóveis) ---------- */
+
+/*
+ * Cena: agrupa as camadas. Sem z-index/transform de propósito: assim as
+ * camadas e o título (fora dela) disputam o mesmo empilhamento e o prédio
+ * pode cobrir o título.
+ */
+.canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * Cada camada é o frame 1440×1175 na sua própria escala --k, posicionado em
+ * (--ox, --oy). As caixas internas usam os % do Figma.
+ */
+.plane {
+  position: absolute;
+  left: var(--ox);
+  top: var(--oy);
+  width: calc(1440 * var(--k));
+  height: calc(1175 * var(--k));
+  will-change: transform;
+}
+
+.box,
+.crop {
+  position: absolute;
+}
+
+/*
+ * Céu: cobre a largura (e a altura, com a sobra de 40% acima da imagem); o
+ * sol (x 1273.6, y 908 no frame) fica no mesmo ponto da composição que no
+ * Figma, perto do indicador.
+ */
+.sky {
+  --k: max(var(--sx), calc((100cqh - 267 * var(--s)) / 1384.2));
+  --ox: calc(50cqw - 720 * var(--k));
+  --oy: calc(100cqh - 267 * var(--s) - 908 * var(--k));
+}
+
+/* Nuvens distantes: cobrem a largura; o centro das faixas (y 302) fica no lugar. */
+.farClouds {
+  --k: var(--sx);
+  --ox: 0px;
+  --oy: calc(100cqh - 873 * var(--s) - 302 * var(--k));
+}
+
+/*
+ * Nuvens centrais: cobrem a largura (a sobra de 33% à direita da imagem fica
+ * fora da tela, como no Figma). O topo da massa de nuvens da esquerda (y 709)
+ * fica no mesmo ponto da composição; a sobra abaixo (até y 1270) garante a
+ * base coberta (k ≥ 466/561 · sy).
+ */
+.midClouds {
+  --k: max(var(--sx), calc(var(--sy) * 466 / 561));
+  --ox: 0px;
+  --oy: calc(709 * var(--sy) - 709 * var(--k));
+}
+
+/* Prédio: objeto isolado, na escala da composição, centralizado e pela base. */
+.buildings {
+  --k: var(--s);
+  --ox: calc(50cqw - 720 * var(--k));
+  --oy: calc(100cqh - 1175 * var(--k));
+}
+
+/*
+ * A base de nuvens do prédio termina num pontilhado semitransparente abaixo
+ * da tela. Em repouso, a base da tela fica sempre em 80,3% da altura da
+ * imagem ((1175 − 162) / 1262); daí para baixo a imagem se desvanece, para
+ * que ao subir no parallax ela se funda nas nuvens centrais (logo atrás) em
+ * vez de mostrar o pontilhado. Não muda nada no estado inicial.
+ */
+.buildings .crop {
+  -webkit-mask-image: linear-gradient(to bottom, #000 80.3%, transparent 83%);
+  mask-image: linear-gradient(to bottom, #000 80.3%, transparent 83%);
+}
+
+/*
+ * Foreground: a imagem das nuvens centrais (1487×1058), espelhada e maior
+ * que elas (mais perto da câmera). A primeira linha opaca fica em 52% da
+ * altura da imagem; em repouso ela fica logo abaixo da base da tela, então
+ * nada aparece até o scroll. Abaixo de 80% a imagem é toda opaca.
+ */
+.foreground {
+  --w: max(160cqw, 190cqh);
+
+  left: calc(50cqw - var(--w) / 2);
+  top: calc(100cqh - var(--w) * 1058 / 1487 * 0.51);
+  width: var(--w);
+  height: calc(var(--w) * 1058 / 1487);
+}
+
+.foreground .crop {
+  transform: scaleX(-1);
+}
+
+/* ---------- Título (node 3:5) — abaixo do prédio na pilha ---------- */
+
+/* Mesmo sistema do prédio (centralizado, pela base) para manter a sobreposição. */
+.title {
+  position: absolute;
+  z-index: 30;
+  left: calc(50cqw - (720 - 191) * var(--s));
+  top: calc(100cqh - (1175 - 267) * var(--s));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: calc(648 * var(--u));
+  margin: 0;
+  font-weight: inherit;
+  line-height: normal;
+}
+
+/* Máscara de cada linha: o texto sobe de dentro dela na entrada. */
+.line {
+  display: block;
+  overflow: hidden;
+}
+
+.line > span {
+  display: block;
+}
+
+.welcomeLine {
+  margin-bottom: calc(-30 * var(--u));
+}
+
+.welcome {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 400;
+  font-size: calc(32 * var(--u));
+  color: #d3d2d3;
+}
+
+.portfolio {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-weight: 700;
+  font-size: calc(120 * var(--u));
+  white-space: nowrap;
+  background-image: linear-gradient(
+    to bottom,
+    #d3d3d3 20.886%,
+    #88478e 111.2%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Camada de UI ---------- */
+
+.ui {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.ui > * {
+  pointer-events: auto;
+}
+
+/* Linhas do Figma são vetores horizontais girados −90°. */
+.vline {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+}
+
+.vline > img {
+  flex: none;
+  max-width: none;
+  rotate: -90deg;
+}
+
+/* Subtítulo (node 10:63) */
+.subtitle {
+  position: absolute;
+  right: calc(80 * var(--sx));
+  top: calc(100cqh - (1175 - 559) * var(--s));
+  display: flex;
+  align-items: flex-start;
+  gap: calc(13 * var(--u));
+}
+
+.subtitle > .vline {
+  height: calc(95 * var(--u));
+}
+
+.subtitle > .vline > img {
+  width: calc(95 * var(--u));
+  height: 1px;
+}
+
+.subtitle > p {
+  width: calc(267 * var(--u));
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(28 * var(--u));
+  line-height: normal;
+  color: #fefefe;
+}
+
+/* Redes sociais (node 5:31) */
+.social {
+  position: absolute;
+  left: calc(80 * var(--sx));
+  top: calc(100cqh - (1175 - 549) * var(--s));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(50 * var(--u));
+  width: calc(40 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cada ícone fica num quadro 35×35 (como no Figma), alinhado ao topo/esquerda. */
+.socialLink {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: calc(35 * var(--u));
+  height: calc(35 * var(--u));
+  transition: opacity var(--hover-duration) var(--hover-ease);
+}
+
+.socialLink img {
+  display: block;
+  width: calc(var(--iw) * var(--u));
+  height: calc(var(--ih) * var(--u));
+}
+
+/*
+ * Hover (hoverEngine.ts): disco branco num círculo um pouco maior que o
+ * ícone (fora do fluxo — o botão não muda de tamanho), com um fio laranja
+ * quase imperceptível; o ícone rola para a versão escura.
+ */
+.socialFill {
+  inset: calc(-9 * var(--u));
+  box-shadow: 0 0 0 1px rgb(252 147 87 / 0);
+  transition: box-shadow var(--hover-duration) var(--hover-ease);
+}
+
+.socialIconDark {
+  filter: brightness(0) invert(0.1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .socialLink:hover .socialFill {
+    box-shadow: 0 0 0 1px rgb(252 147 87 / 0.35);
+  }
+
+  /* Foco no ícone sob o cursor: os irmãos recuam um pouco. */
+  .social:has(.socialLink:hover) .socialLink:not(:hover) {
+    opacity: var(--hover-sibling-opacity);
+  }
+}
+
+.social > .vline {
+  height: calc(148 * var(--u));
+}
+
+.social > .vline > img {
+  width: calc(148 * var(--u));
+  height: 1px;
+}
+
+/*
+ * Indicador "ROLE A PAGINA" (node 14:96). O texto gira devagar e sem parar
+ * (sealSpin.ts, no wrapper .ringSpin); com movimento reduzido fica parado.
+ */
+.indicator {
+  --ind: calc(125 * var(--u));
+
+  position: absolute;
+  right: calc(73 * var(--sx));
+  top: calc(100cqh - (1175 - 932) * var(--s));
+  width: var(--ind);
+  height: var(--ind);
+  border-radius: 50%;
+  color: #fff;
+}
+
+.ring,
+.ringSpin {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * Cada glifo ocupa uma caixa de 19,68px (no Figma) alinhada à borda do
+ * círculo, com o texto na base da caixa; gira em torno do centro.
+ */
+.glyph {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1.2em;
+  height: 50%;
+  margin-left: -0.6em;
+  padding-top: calc(var(--ind) * 5.16 / 125);
+  transform-origin: 50% 100%;
+  font-weight: 500;
+  font-size: calc(var(--ind) * 12 / 125);
+  line-height: normal;
+  text-align: center;
+}
+
+/*
+ * ---------- Mobile (< 768px) ----------
+ * Na escala do frame tudo ficaria minúsculo: todas as camadas usam o mesmo
+ * frame em "cover" (centrado nos prédios) e a UI usa posições de fluxo.
+ */
+@media (max-width: 767.98px) {
+  .track {
+    height: var(--track-h-mobile, 150svh);
+  }
+
+  .hero {
+    min-height: 560px;
+  }
+
+  .hero .plane:not(.foreground) {
+    --k: max(var(--sx), var(--sy));
+    --ox: calc(50cqw - 720 * var(--k));
+    --oy: 0px;
+  }
+
+  .title {
+    --pf: clamp(44px, 14.5cqw, 72px);
+
+    left: 20px;
+    top: 15cqh;
+    width: auto;
+  }
+
+  .welcomeLine {
+    margin-bottom: calc(var(--pf) * -30 / 120);
+  }
+
+  .welcome {
+    font-size: calc(var(--pf) * 32 / 120);
+  }
+
+  .portfolio {
+    font-size: var(--pf);
+  }
+
+  /* Abaixo do título: altura do bloco ≈ pf × 1.4 (line-height normal das fontes). */
+  .subtitle {
+    right: auto;
+    left: 20px;
+    top: calc(15cqh + clamp(44px, 14.5cqw, 72px) * 1.4 + 20px);
+    gap: 8px;
+  }
+
+  .subtitle > .vline {
+    height: 58px;
+  }
+
+  .subtitle > .vline > img {
+    width: 58px;
+  }
+
+  .subtitle > p {
+    width: min(267px, 70cqw);
+    font-size: 17px;
+  }
+
+  .social {
+    --u: calc(26px / 35);
+
+    top: auto;
+    bottom: 28px;
+    left: 20px;
+    flex-direction: row;
+    gap: 20px;
+    width: auto;
+  }
+
+  .social > .vline {
+    width: 40px;
+    height: 1px;
+  }
+
+  .social > .vline > img {
+    width: 40px;
+    rotate: none;
+  }
+
+  .indicator {
+    --ind: 88px;
+
+    top: auto;
+    left: auto;
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+/* Movimento reduzido: sem trecho extra de scroll — o Hero fica estático. */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    height: auto;
+  }
+}

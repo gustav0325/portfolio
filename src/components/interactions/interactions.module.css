@@ -1,0 +1,169 @@
+/*
+ * Camadas das microinterações (motor em src/lib/interactions/hoverEngine.ts).
+ * Em repouso, nada aqui muda o desenho: as cópias ficam escondidas e o
+ * texto original aparece como sempre.
+ */
+
+/* ---------- TextRoll ---------- */
+
+/*
+ * Em repouso aparece o texto original (com o kerning da fonte). Durante o
+ * hover, a versão dividida em letras — cada uma com uma cópia logo abaixo —
+ * fica por cima, no mesmo lugar, e rola dentro da máscara de cada palavra.
+ */
+.roll {
+  position: relative;
+  display: inline-block;
+}
+
+.rollSplit {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.roll[data-rolling] > .rollStatic {
+  opacity: 0;
+}
+
+.roll[data-rolling] > .rollSplit {
+  opacity: 1;
+}
+
+/*
+ * Máscara por palavra. overflow (e não clip-path, que deixa escapar as letras
+ * em camada própria durante o movimento); vertical-align: top mantém o texto
+ * na mesma linha de base do original.
+ */
+.rollWord {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.rollUnit {
+  position: relative;
+  display: inline-block;
+}
+
+.rollCopy {
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+/* ---------- IconRoll ---------- */
+
+/*
+ * A máscara e a cópia só existem durante o hover (data-rolling): em repouso
+ * o ícone é exatamente o original (os SVGs desenham um pouco além da caixa).
+ */
+.iconRoll {
+  position: relative;
+  display: block;
+}
+
+.iconRoll[data-rolling] {
+  overflow: hidden;
+}
+
+.iconUnit {
+  position: relative;
+  display: block;
+}
+
+.iconUnit > .rollCopy {
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+}
+
+.iconRoll[data-rolling] .rollCopy {
+  visibility: visible;
+}
+
+/* ---------- AnimatedArrow ---------- */
+
+.arrow {
+  position: relative;
+  display: inline-flex;
+  /* Máscara um pouco maior que a seta: ela some ao sair de dentro dela. */
+  clip-path: inset(-20%);
+}
+
+.arrowFace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrowCopy {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+/* ---------- HoverFill ---------- */
+
+/* Caixa que recorta o disco (sempre circular), atrás do ícone. */
+.fillBox {
+  position: absolute;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Tamanho e posição vêm do motor; sem ele (movimento reduzido), cobre a caixa. */
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+  transform: scale(0);
+}
+
+.fillPaint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Variante clara (Hero): branco, com um detalhe laranja quase imperceptível. */
+.fillPaint[data-tone="light"] {
+  background: radial-gradient(120% 120% at 30% 25%, #fff 70%, #ffeadf);
+}
+
+/* Variante pôr do sol (fundos claros): laranja → rosa do céu do Hero. */
+.fillPaint[data-tone="sunset"] {
+  background: var(--sunset-gradient);
+}
+
+/* ---------- ProjectSpotlight ---------- */
+
+.zoomLayer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Reflexo radial claro, sem borda; segue o ponteiro (x/y via GSAP). */
+.spotlight {
+  --spot: 70cqw;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--spot);
+  height: var(--spot);
+  margin: calc(var(--spot) / -2) 0 0 calc(var(--spot) / -2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff, rgb(255 255 255 / 0.5) 45%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}

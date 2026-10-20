@@ -1,0 +1,383 @@
+/*
+ * Navbar global: barra de vidro flutuante, fixa no topo.
+ *
+ * Medidas da imagem de referência (tela de 1653px), em px na escala:
+ *   --sx = largura da tela / 1440 → margens laterais (63px a 1440);
+ *   --u  = min(sx, 1px) → altura, distância do topo, logo e textos
+ *          (não crescem além da referência em telas grandes).
+ */
+.shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  container-type: inline-size;
+  pointer-events: none;
+
+  --sx: calc(100cqw / 1440);
+  --u: min(var(--sx), 1px);
+}
+
+/* ---------- Barra de vidro ---------- */
+
+.bar {
+  position: absolute;
+  top: calc(32 * var(--u));
+  right: calc(63 * var(--sx));
+  left: calc(63 * var(--sx));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(62 * var(--u));
+  padding: 0 calc(54 * var(--u)) 0 calc(38 * var(--u));
+  border: 1px solid rgb(255 255 255 / 0.28);
+  border-radius: 999px;
+  color: #fff;
+  background-color: rgb(255 255 255 / 0.05);
+  /* Brilho fino no topo e na base, como vidro fosco, e sombra bem leve. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 -1px 0 rgb(255 255 255 / 0.1),
+    0 8px 24px rgb(0 0 0 / 0.08);
+  /* Vidro fosco: desfoca e tira um pouco da saturação do que está atrás. */
+  -webkit-backdrop-filter: blur(16px) saturate(95%);
+  backdrop-filter: blur(16px) saturate(95%);
+  pointer-events: auto;
+  transition:
+    color 250ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Sobre fundo claro (Projetos, Contato): texto preto e vidro mais leitoso. */
+.bar.light {
+  border-color: rgb(0 0 0 / 0.08);
+  color: #000;
+  background-color: rgb(255 255 255 / 0.62);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 -1px 0 rgb(255 255 255 / 0.5),
+    0 8px 24px rgb(0 0 0 / 0.06);
+}
+
+/*
+ * Sobre fundo escuro (cards de Projetos, Sobre): vidro escuro translúcido.
+ * O vidro claro sobre preto vira um cinza sujo; este escurece o que está
+ * atrás (inclusive as pontas da barra que passam do card, sobre o branco),
+ * mantém o desfoque e uma borda clara bem discreta.
+ */
+.bar.darkGlass {
+  border-color: rgb(255 255 255 / 0.14);
+  color: #fff;
+  background-color: rgb(16 15 18 / 0.58);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -1px 0 rgb(255 255 255 / 0.04),
+    0 8px 24px rgb(0 0 0 / 0.12);
+}
+
+/* ---------- Conteúdo ---------- */
+
+.logo {
+  display: block;
+  width: calc(53 * var(--u));
+  height: calc(38 * var(--u));
+  transition: transform 0.35s var(--hover-ease);
+}
+
+.logoLink {
+  display: block;
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  gap: calc(80 * var(--u));
+}
+
+.links {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(71 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link,
+.lang {
+  font-weight: 500;
+  font-size: calc(17 * var(--u));
+  line-height: normal;
+  white-space: nowrap;
+  color: inherit;
+}
+
+/* Acima da pílula de hover. */
+.link {
+  position: relative;
+}
+
+.lang {
+  transition: opacity var(--hover-duration) var(--hover-ease);
+}
+
+.lang:hover {
+  opacity: 0.7;
+}
+
+/*
+ * Pílula de hover (useHoverPill.ts): fundo translúcido sutil que desliza
+ * entre os links sob o mouse; posição e tamanho vêm do GSAP. Mais clara no
+ * vidro escuro, mais escura no claro — sem competir com o vidro.
+ */
+.pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: background-color 250ms ease;
+}
+
+.bar.light .pill {
+  background: rgb(0 0 0 / 0.05);
+}
+
+.bar.darkGlass .pill {
+  background: rgb(255 255 255 / 0.08);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .logoLink:hover .logo {
+    transform: scale(var(--hover-logo-scale));
+  }
+}
+.lang {
+  display: flex;
+  align-items: center;
+  gap: calc(2 * var(--u));
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* Chevron de ~10px visíveis (ícone de 20px com margem interna). */
+.langIcon {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  transition: transform var(--hover-duration) var(--hover-ease);
+}
+
+/* Gira 180° com o menu aberto (LanguageSwitcher.tsx); o ícone desce no hover. */
+.langChevron {
+  display: inline-flex;
+}
+
+/* Responde ao hover descendo de leve. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .lang:hover .langIcon {
+    transform: translateY(calc(2 * var(--u)));
+  }
+}
+
+.menuButton {
+  display: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/*
+ * Indicador da seção atual: um único elemento que desliza entre os links
+ * (useActiveIndicator.ts). Linha fina logo abaixo do texto, na cor do tema
+ * (currentColor), sumindo para um dos lados: duas camadas de degradê trocam
+ * por cross-fade quando o lado muda. Posição e largura vêm por transform
+ * (x, y, scaleX sobre 100px); a espessura usa o tamanho do texto dos links.
+ */
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: max(1px, 0.025em);
+  font-size: calc(17 * var(--u));
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.indicatorFade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, currentColor, transparent);
+}
+
+.indicatorFade[data-fade="left"] {
+  background: linear-gradient(to left, currentColor, transparent);
+  opacity: 0;
+}
+
+/*
+ * ---------- Menu de idiomas (LanguageSwitcher.tsx) ----------
+ * Fica na navbar fixa, fora da barra (portal): o vidro dele desfoca a página
+ * de verdade. Mesmo vidro da barra em cada tema, um pouco mais denso para o
+ * texto continuar legível sobre o Hero colorido. Posição (top/right), entrada
+ * e saída vêm do GSAP; fechado, fica invisível e sem receber cliques.
+ */
+.langMenu {
+  --menu-gap: calc(10 * var(--u));
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: calc(196 * var(--u));
+  margin: 0;
+  padding: calc(6 * var(--u));
+  list-style: none;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: calc(18 * var(--u));
+  color: #fff;
+  background-color: rgb(22 20 24 / 0.6);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    0 12px 32px rgb(0 0 0 / 0.18);
+  -webkit-backdrop-filter: blur(16px) saturate(95%);
+  backdrop-filter: blur(16px) saturate(95%);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: auto;
+  transition:
+    color 250ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease;
+}
+
+.shell[data-theme="light"] .langMenu {
+  border-color: rgb(0 0 0 / 0.08);
+  color: #000;
+  background-color: rgb(255 255 255 / 0.78);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 12px 32px rgb(0 0 0 / 0.08);
+}
+
+.shell[data-theme="dark-glass"] .langMenu {
+  border-color: rgb(255 255 255 / 0.14);
+  background-color: rgb(16 15 18 / 0.72);
+}
+
+.langOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24 * var(--u));
+  width: 100%;
+  padding: calc(10 * var(--u)) calc(14 * var(--u));
+  border: 0;
+  border-radius: calc(12 * var(--u));
+  background: transparent;
+  color: inherit;
+  font-weight: 500;
+  font-size: calc(15 * var(--u));
+  line-height: normal;
+  text-align: left;
+  white-space: nowrap;
+  opacity: 0.62;
+  transition:
+    opacity var(--hover-duration) var(--hover-ease),
+    background-color var(--hover-duration) var(--hover-ease);
+}
+
+/* Idioma atual: texto pleno e um ponto rosa antes da sigla. */
+.langOption[aria-checked="true"] {
+  opacity: 1;
+}
+
+.langCode {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  font-size: calc(13 * var(--u));
+  letter-spacing: 0.06em;
+}
+
+.langOption[aria-checked="true"] .langCode::before {
+  content: "";
+  width: calc(5 * var(--u));
+  height: calc(5 * var(--u));
+  border-radius: 50%;
+  background: var(--sunset-rose);
+}
+
+.langOption:hover,
+.langOption:focus-visible {
+  opacity: 1;
+  background-color: rgb(255 255 255 / 0.08);
+}
+
+.shell[data-theme="light"] .langOption:hover,
+.shell[data-theme="light"] .langOption:focus-visible {
+  background-color: rgb(0 0 0 / 0.05);
+}
+
+.langOption:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Menu mobile: as duas siglas lado a lado (sem dropdown). */
+.langChoices {
+  display: flex;
+  gap: calc(8 * var(--u));
+}
+
+.langChoice {
+  padding: calc(6 * var(--u)) calc(12 * var(--u));
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-weight: 500;
+  font-size: calc(17 * var(--u));
+  line-height: normal;
+  opacity: 0.55;
+}
+
+.langChoice[aria-pressed="true"] {
+  opacity: 1;
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 1023.98px) {
+  .main {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .bar {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    height: 52px;
+    padding: 0 16px 0 20px;
+  }
+
+  .logo {
+    width: 45px;
+    height: 32px;
+  }
+}

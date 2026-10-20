@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+:root {
+  /* Cores do logo RD no Figma; a base escura também é o fundo das próximas seções. */
+  --background: #1a191b;
+  --foreground: #fefefe;
+
+  /*
+   * Microinterações (valores do GSAP em src/lib/interactions/hoverConfig.ts;
+   * manter iguais). Laranja e rosa tirados do horizonte do céu do Hero.
+   */
+  --sunset-orange: #fc9357;
+  --sunset-pink: #db5f71;
+  --sunset-rose: #d6959e;
+  --sunset-gradient: linear-gradient(135deg, var(--sunset-orange), var(--sunset-pink));
+  /* power3.out do GSAP em CSS. */
+  --hover-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --hover-duration: 0.4s;
+  --hover-sibling-opacity: 0.65;
+  --hover-logo-scale: 1.04;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/*
+ * Compensação da navbar fixa: links para as seções param abaixo dela.
+ * Base da barra = topo (32) + altura (62) na escala da navbar
+ * (navbar.module.css).
+ */
+html {
+  overflow-x: clip;
+  scroll-padding-top: calc(94 * min(100vw / 1440, 1px));
+}
+
+@media (max-width: 767.98px) {
+  html {
+    scroll-padding-top: 64px; /* navbar mobile: 12px + barra de 52px */
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/*
+ * Foco por teclado: contorno visível em fundo claro e escuro. Segue a cor
+ * do texto, ou a do fundo declarado pela seção (data-nav-theme).
+ */
+[data-nav-theme="light"] {
+  --focus-ring: #181818;
+}
+
+[data-nav-theme="dark"],
+[data-nav-theme="dark-glass"] {
+  --focus-ring: #fff;
+}
+
+:where(button:not(:disabled), [role="button"], summary) {
+  /* Cursor nativo de clique (o preflight do Tailwind usa o padrão nos botões). */
+  cursor: pointer;
+}
+
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring, currentColor);
+  outline-offset: 4px;
+}
+
+/*
+ * Movimento reduzido (com mouse): os hovers ficam só com cor e contraste.
+ * O disco de preenchimento aparece por fade, sem crescer; o ícone troca de
+ * cor sem rolar. Valem as mesmas classes de components/interactions.
+ */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  [data-fill] {
+    transform: none !important;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  [data-hover]:hover [data-fill] {
+    opacity: 1;
+  }
+
+  [data-hover]:hover [data-roll="icon"] [data-roll-unit] > :first-child {
+    opacity: 0;
+  }
+
+  [data-hover]:hover [data-roll="icon"] [data-roll-unit] > :last-child {
+    top: 0;
+    visibility: visible;
+  }
+}
+
+/*
+ * Entrada do Hero — estados iniciais até o GSAP assumir (os mesmos valores
+ * de INTRO.*.from em src/lib/animations/heroIntro.ts; manter iguais). Valem
+ * só enquanto <html> tem a classe hero-intro: sem JS, com movimento reduzido
+ * ou com a página restaurada no meio do scroll, o Hero aparece pronto.
+ */
+html.hero-intro [data-intro="navbar"] {
+  opacity: 0;
+  transform: translateY(-28px);
+}
+
+/* "Welcome to" / "Portfólio" sobem de dentro da máscara da linha. */
+html.hero-intro [data-intro="title"] {
+  opacity: 0;
+  transform: translateY(110%);
+}
+
+/* Prédio + nuvens da base: emergem juntos, de leve. */
+html.hero-intro [data-intro="scene"] {
+  opacity: 0.78;
+  transform: translateY(50px);
+}
+
+/* Céu e nuvens distantes: presentes desde o primeiro quadro. */
+html.hero-intro [data-intro="backdrop"] {
+  opacity: 0.92;
+}
+
+html.hero-intro [data-intro="tagline"] {
+  opacity: 0;
+  transform: translateX(24px);
+}
+
+html.hero-intro [data-intro="social"] {
+  opacity: 0;
+  transform: translateX(-18px);
+}
+
+html.hero-intro [data-intro="seal"] {
+  opacity: 0;
+  transform: scale(0.9);
+}

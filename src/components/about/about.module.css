@@ -1,0 +1,596 @@
+/*
+ * Seção Sobre — frame "Sobre" do Figma (node 26:56, 1440 × 1024).
+ *
+ * ≥ 1024px: a seção mantém a proporção do frame e tudo escala junto.
+ *   --u = 1px do Figma (100cqw / 1440); medidas = "valor do Figma × --u".
+ *   A navbar é global e fixa: a faixa dela no frame (y 0–121) não faz parte
+ *   da seção, então os "top" abaixo são "y do Figma − 121" e a seção tem
+ *   1024 − 121 = 903px. A compensação da navbar é o scroll-padding global.
+ * < 1024px: layout em fluxo, sem redesenho (ver final do arquivo).
+ */
+.section {
+  position: relative;
+  aspect-ratio: 1440 / 903;
+  overflow: hidden;
+  container-type: inline-size;
+  background: #141414;
+  color: #fff;
+
+  --u: calc(100cqw / 1440);
+}
+
+/* Texto só para leitores de tela (o texto dividido para a animação fica aria-hidden). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Rótulos em caixa alta com espaçamento (SOBRE MIM, FERRAMENTAS…, ÁREAS…). */
+.eyebrow {
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(12 * var(--u));
+  line-height: normal;
+  letter-spacing: calc(1.68 * var(--u));
+  color: #b5b5b5;
+}
+
+/* ---------- Índice (node 29:2) ---------- */
+
+.index {
+  position: absolute;
+  top: calc(63 * var(--u)); /* y 184 */
+  left: calc(80 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(14 * var(--u));
+  line-height: normal;
+}
+
+.index::after {
+  content: "";
+  width: calc(36 * var(--u));
+  height: 1px;
+  background: #b5b5b5;
+}
+
+/* ---------- Headline (node 29:5) ---------- */
+
+.headline {
+  position: absolute;
+  top: calc(89 * var(--u)); /* y 210 */
+  left: calc(80 * var(--u));
+  margin: 0;
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 800;
+  font-size: calc(80 * var(--u));
+  line-height: calc(84 * var(--u));
+  letter-spacing: calc(-2.4 * var(--u));
+  white-space: nowrap;
+}
+
+.headline > span {
+  display: block;
+  width: fit-content;
+}
+
+/*
+ * "do código.": gradiente horizontal de #c5c5c5 a #212121. O padding inferior
+ * (compensado na margem) estende a área pintada para incluir a descendente do
+ * "g", que passa da linha de 84px.
+ */
+.headlineMuted {
+  --muted-gradient: linear-gradient(to right, #c5c5c5, #212121 93.331%);
+
+  padding-bottom: 0.25em;
+  margin-bottom: -0.25em;
+  background-image: var(--muted-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/*
+ * Durante a animação (aboutMotion.ts liga data-letter-gradient): cada letra
+ * pinta o próprio pedaço do mesmo degradê — largura da linha (--gw) e
+ * deslocamento da letra (--gx), medidos em em. Assim cada letra pode ter
+ * opacidade própria sem perder a cor (no Chrome, um filho com opacidade
+ * deixa de receber o background-clip: text do pai).
+ */
+.headline[data-letter-gradient] .headlineMuted {
+  background-image: none;
+}
+
+.headline[data-letter-gradient] .headlineMuted [data-reveal-unit] {
+  padding-bottom: 0.25em;
+  background-image: var(--muted-gradient);
+  background-size: var(--gw) 100%;
+  background-position: calc(-1 * var(--gx, 0em)) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/*
+ * Ponto final em destaque (ABOUT_MOTION.headline.accentPeriod): a cor dos
+ * números no lugar da cor do degradê. Desligado, fica como no Figma.
+ */
+.headline[data-accent-period="true"] .headlineMuted [data-accent] {
+  background-image: none;
+  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
+}
+
+/* ---------- Área da foto (node 29:8) ---------- */
+
+/*
+ * Moldura da foto (mask group 60:3): 458×446 em (80, 413). A foto (60:2,
+ * 458×610 no Figma) fica alinhada pela base e cortada no topo — o céu escuro
+ * sai do quadro. Para o parallax ela é um pouco maior (--photo-room a mais
+ * de altura, ~4%), centrada no mesmo ponto: na metade do percurso o
+ * enquadramento é o do Figma e as bordas nunca ficam vazias.
+ */
+.visual {
+  /* Altura da foto do Figma (610) em % da altura e em % da largura da moldura. */
+  --photo-h: calc(610 / 446 * 100%);
+  --photo-h-w: calc(610 / 458 * 100%);
+
+  position: absolute;
+  top: calc(292 * var(--u)); /* y 413 */
+  left: calc(80 * var(--u));
+  width: calc(458 * var(--u));
+  height: calc(446 * var(--u));
+  overflow: hidden;
+  background: #141414;
+}
+
+.photoReveal,
+.photoParallax {
+  position: absolute;
+  inset: 0;
+}
+
+.photo {
+  position: absolute;
+  bottom: calc(var(--photo-room) / -2);
+  left: 50%;
+  width: auto;
+  max-width: none;
+  height: calc(var(--photo-h) + var(--photo-room));
+  /* Centrada: metade da largura (proporção 1086:1448 = 0,75), sem transform. */
+  margin-left: calc((var(--photo-h-w) + var(--photo-room)) * -0.375);
+}
+
+/* Movimento reduzido: sem parallax, então sem folga — o corte exato do Figma. */
+@media (prefers-reduced-motion: reduce) {
+  .visual {
+    --photo-room: 0px !important;
+  }
+}
+
+/* ---------- Coluna direita (node 29:13) ---------- */
+
+.column {
+  position: absolute;
+  top: calc(89 * var(--u)); /* y 210 */
+  left: calc(870 * var(--u));
+  width: calc(490 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(28 * var(--u));
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(18 * var(--u));
+  width: 100%;
+}
+
+.intro > .eyebrow {
+  font-size: calc(13 * var(--u));
+  letter-spacing: calc(1.82 * var(--u));
+}
+
+.introBody {
+  display: flex;
+  flex-direction: column;
+  gap: calc(26 * var(--u));
+  width: 100%;
+}
+
+.statement {
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(30 * var(--u));
+  line-height: calc(38 * var(--u));
+  letter-spacing: calc(-0.6 * var(--u));
+}
+
+/* As três linhas são explícitas no Figma (node 29:17). */
+.statement > span {
+  display: block;
+  white-space: nowrap;
+}
+
+.statement strong {
+  font-weight: 600;
+}
+
+.paragraph {
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(17 * var(--u));
+  line-height: calc(26 * var(--u));
+  color: #c5c5c5;
+}
+
+.rule {
+  width: calc(28 * var(--u));
+  height: 1px;
+  background: #363636;
+}
+
+/* Indicadores (node 29:20): divisor de 1×54 a 18px de cada lado. */
+.stats {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(2 * var(--u));
+  white-space: nowrap;
+}
+
+.stat + .stat {
+  margin-left: calc(18 * var(--u));
+  padding-left: calc(18 * var(--u) + 1px);
+}
+
+/* --divider (0–1) desenha o divisor de cima para baixo na animação. */
+.stat + .stat::before {
+  content: "";
+  position: absolute;
+  top: calc(4.5 * var(--u));
+  left: 0;
+  width: 1px;
+  height: calc(54 * var(--u));
+  background: #363636;
+  transform: scaleY(var(--divider, 1));
+  transform-origin: top;
+}
+
+.statValue {
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 700;
+  font-size: calc(32 * var(--u));
+  line-height: normal;
+  color: #d6959e;
+}
+
+.statLabel {
+  font-weight: 400;
+  font-size: calc(14 * var(--u));
+  line-height: normal;
+  color: #b5b5b5;
+}
+
+/* Ferramentas (node 29:33). */
+.tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(16 * var(--u));
+}
+
+.toolList {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  font-weight: 500;
+  font-size: calc(14 * var(--u));
+  line-height: normal;
+  letter-spacing: calc(1.12 * var(--u));
+  white-space: nowrap;
+}
+
+.tool > img {
+  width: calc(3 * var(--u));
+  height: calc(3 * var(--u));
+}
+
+/* CTA "Vamos conversar ↗" (node 29:45). */
+.cta {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  color: #fff;
+}
+
+/* Camada interna do CTA: só ela se move no hover (o link não sai do lugar). */
+.ctaInner {
+  display: flex;
+  align-items: inherit;
+  gap: inherit;
+}
+
+.ctaLabel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--u));
+  font-weight: 500;
+  font-size: calc(18 * var(--u));
+  line-height: normal;
+  white-space: nowrap;
+}
+
+/*
+ * --cta-line (0–1, entrada) desenha o sublinhado da esquerda para a direita;
+ * --line e --line-origin (hover, hoverEngine.ts) o retraem para a direita e
+ * o redesenham. Os dois se multiplicam, sem disputar o mesmo valor.
+ */
+.ctaLabel::after {
+  content: "";
+  width: 100%;
+  height: 1px;
+  background: #d6959e;
+  transform: scaleX(calc(var(--cta-line, 1) * var(--line, 1)));
+  transform-origin: var(--line-origin, left);
+}
+
+.ctaArrow {
+  font-weight: 400;
+  font-size: calc(18 * var(--u));
+  line-height: normal;
+  color: #d6959e;
+}
+
+/* ---------- Rodapé interno: áreas de atuação ---------- */
+
+.footerRule {
+  position: absolute;
+  top: calc(738 * var(--u)); /* y 859 */
+  left: calc(80 * var(--u));
+  width: calc(1280 * var(--u));
+  height: 1px;
+  background: #363636;
+  transform-origin: left; /* desenhada da esquerda para a direita */
+}
+
+.areasLabel {
+  position: absolute;
+  top: calc(765 * var(--u)); /* y 886 */
+  left: calc(80 * var(--u));
+}
+
+/* Três colunas de 410px a cada 435px; divisor vertical 12px após cada uma. */
+.areas {
+  position: absolute;
+  top: calc(792 * var(--u)); /* y 913 */
+  left: calc(80 * var(--u));
+  display: flex;
+  gap: calc(25 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(410 * var(--u));
+  height: calc(51 * var(--u));
+  font-weight: 500;
+  font-size: calc(16 * var(--u));
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.area + .area::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(-13 * var(--u));
+  width: 1px;
+  height: 100%;
+  background: #363636;
+}
+
+.areaName {
+  display: flex;
+  align-items: center;
+  gap: calc(16 * var(--u));
+}
+
+.areaNumber {
+  display: flex;
+  align-items: center;
+  gap: calc(16 * var(--u));
+  color: #b5b5b5;
+}
+
+.areaNumber::after {
+  content: "";
+  width: calc(34 * var(--u));
+  height: 1px;
+  background: #5a5a5a;
+}
+
+.areaArrow {
+  font-weight: 400;
+  color: #b5b5b5;
+}
+
+/*
+ * Áreas de atuação não são links: o hover é só uma reação visual discreta
+ * (sem cursor de clique) — fundo translúcido, número rosa, a linha cresce e
+ * a seta avança na própria diagonal.
+ */
+.area {
+  isolation: isolate;
+}
+
+.area::after {
+  content: "";
+  position: absolute;
+  inset: 0 calc(-8 * var(--u));
+  z-index: -1;
+  border-radius: calc(6 * var(--u));
+  background: rgb(255 255 255 / 0.035);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.area::after,
+.areaNumber,
+.areaNumber::after,
+.areaArrow {
+  transition:
+    opacity var(--hover-duration) var(--hover-ease),
+    color var(--hover-duration) var(--hover-ease),
+    background-color var(--hover-duration) var(--hover-ease),
+    transform var(--hover-duration) var(--hover-ease);
+}
+
+.areaNumber::after {
+  transform-origin: left;
+}
+
+.areaArrow {
+  display: inline-block;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .area:hover::after {
+    opacity: 1;
+  }
+
+  .area:hover .areaNumber {
+    color: var(--sunset-rose);
+  }
+
+  .area:hover .areaNumber::after {
+    background-color: var(--sunset-rose);
+    transform: scaleX(1.35);
+  }
+
+  .area:hover .areaArrow {
+    color: #e6e6e6;
+    transform: translate(3px, -3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .area:hover .areaNumber::after,
+  .area:hover .areaArrow {
+    transform: none;
+  }
+}
+
+/* ---------- < 1024px: fluxo simples, mesma identidade (sem redesenho) ---------- */
+
+@media (max-width: 1023.98px) {
+  .section {
+    --u: 1px;
+
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 48px 24px 64px;
+  }
+
+  .index,
+  .headline,
+  .visual,
+  .column,
+  .footerRule,
+  .areasLabel,
+  .areas {
+    position: static;
+  }
+
+  .headline {
+    font-size: clamp(44px, 11cqw, 80px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    white-space: normal;
+  }
+
+  .visual {
+    --photo-room: var(--photo-room-mobile) !important;
+
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 458 / 446;
+  }
+
+  .column {
+    width: auto;
+  }
+
+  .statement {
+    font-size: clamp(22px, 5cqw, 30px);
+    line-height: 1.27;
+  }
+
+  .statement > span {
+    white-space: normal;
+  }
+
+  .stats,
+  .toolList {
+    flex-wrap: wrap;
+    row-gap: 16px;
+  }
+
+  .footerRule {
+    width: 100%;
+  }
+
+  .areas {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .area {
+    width: 100%;
+  }
+
+  .area + .area::before {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "title": "Portfolio",
+    "description": "Design and technology for meaningful digital experiences."
+  },
+  "nav": {
+    "home": "RD — home",
+    "main": "Main",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu",
+    "language": "Language",
+    "languageName": {
+      "pt-BR": "Português",
+      "en": "English"
+    }
+  },
+  "social": {
+    "list": "Social media",
+    "open": "Open"
+  },
+  "hero": {
+    "section": "Home",
+    "title": "Portfolio",
+    "tagline": "Design and technology for meaningful digital experiences.",
+    "scroll": "Scroll down",
+    "ring": "SCROLL DOWN  |  SCROLL DOWN  |  "
+  },
+  "projects": {
+    "headingLine1": "Selected",
+    "headingLine2": "Projects",
+    "lead": "Design and technology for brands building meaningful experiences.",
+    "indicator": "Projects",
+    "tags": "Technologies and year",
+    "items": {
+      "gvt": {
+        "description": "Website redesign and development for a company specializing in concrete cutting and core drilling.",
+        "imageAlt": "Home page of the GVT Cortes e Furos website"
+      },
+      "lumi": {
+        "description": "Complete website design and development for a beauty studio, featuring a sophisticated visual identity, an intuitive interface, and a user-centered experience.",
+        "imageAlt": "Home page of the Lumi Studio website"
+      },
+      "vincent": {
+        "description": "Complete website design and development for a law firm, featuring sophisticated design, a professional visual identity, and intuitive navigation.",
+        "imageAlt": "Home page of the Vincent Advogado website"
+      }
+    }
+  },
+  "about": {
+    "headlineLine1": "Beyond",
+    "headlineLine2": "the code.",
+    "photoAlt": "Personal portrait with the city lights in the background.",
+    "eyebrow": "ABOUT ME",
+    "statement": {
+      "line1": "I turn ideas into",
+      "strong": "digital experiences",
+      "line2": " that combine",
+      "line3": "design, technology, and functionality."
+    },
+    "paragraph": "I design and develop business websites, redesigns, and interactive interfaces, combining aesthetics, performance, and attention to detail. I enjoy turning ideas into real projects that deliver results and strengthen each brand's identity.",
+    "stats": {
+      "projects": "projects completed",
+      "experience": "year of experience",
+      "focus": "focused on real-world solutions"
+    },
+    "tools": "TOOLS I USE",
+    "cta": "Let's talk",
+    "areasLabel": "AREAS OF EXPERTISE",
+    "areas": {
+      "design": "Web Design & UI/UX",
+      "development": "Web Development",
+      "interactive": "Interactive Experiences"
+    }
+  },
+  "contact": {
+    "label": "CONTACT",
+    "headlineLine1": "Have an idea?",
+    "headlineLine2": "Let's create together.",
+    "lead1": "I'm open to new projects, collaborations, and opportunities.",
+    "lead2": "Let's talk about turning your idea into a meaningful digital experience.",
+    "cta": "Get in touch",
+    "copy": {
+      "idle": "Copy email",
+      "copied": "Copied ✓",
+      "error": "Couldn't copy",
+      "announceCopied": "Email copied.",
+      "announceError": "Couldn't copy the email. It's still visible next to the button so you can copy it manually."
+    },
+    "copyright": "© 2026 — RD PORTFOLIO",
+    "whatsappMessage": "Hello! I found your portfolio and would like to discuss a project."
+  }
+}

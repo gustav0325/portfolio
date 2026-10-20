@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "title": "Portfólio",
+    "description": "Design e tecnologia para experiências digitais reais."
+  },
+  "nav": {
+    "home": "RD — início",
+    "main": "Principal",
+    "projects": "Projetos",
+    "about": "Sobre",
+    "contact": "Contato",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "menu": "Menu",
+    "language": "Idioma",
+    "languageName": {
+      "pt-BR": "Português",
+      "en": "English"
+    }
+  },
+  "social": {
+    "list": "Redes sociais",
+    "open": "Abrir"
+  },
+  "hero": {
+    "section": "Início",
+    "title": "Portfólio",
+    "tagline": "Design e tecnologia para experiências digitais reais.",
+    "scroll": "Role a página",
+    "ring": "ROLE A PAGINA | ROLE A PAGINA | "
+  },
+  "projects": {
+    "headingLine1": "Projetos",
+    "headingLine2": "Selecionados",
+    "lead": "Design e tecnologia para marcas que constroem experiências reais.",
+    "indicator": "Projetos",
+    "tags": "Tecnologias e ano",
+    "items": {
+      "gvt": {
+        "description": "Redesign e desenvolvimento de um site institucional para uma empresa especializada em cortes e furos em concreto.",
+        "imageAlt": "Página inicial do site da GVT Cortes e Furos"
+      },
+      "lumi": {
+        "description": "Criação e desenvolvimento completo de um website para um estúdio de beleza, com identidade visual sofisticada, interface intuitiva e foco na experiência do usuário.",
+        "imageAlt": "Página inicial do site do Lumi Studio"
+      },
+      "vincent": {
+        "description": "Criação e desenvolvimento completo de um website para um escritório de advocacia, com design sofisticado, identidade visual profissional e navegação intuitiva.",
+        "imageAlt": "Página inicial do site de Vincent Advogado"
+      }
+    }
+  },
+  "about": {
+    "headlineLine1": "Muito além",
+    "headlineLine2": "do código.",
+    "photoAlt": "Retrato pessoal com a cidade iluminada ao fundo.",
+    "eyebrow": "SOBRE MIM",
+    "statement": {
+      "line1": "Transformo ideias em",
+      "strong": "experiências digitais",
+      "line2": " que unem",
+      "line3": "design, tecnologia e funcionalidade."
+    },
+    "paragraph": "Atuo na criação e desenvolvimento de sites institucionais, redesigns e interfaces interativas, unindo estética, performance e atenção aos detalhes. Gosto de transformar ideias em projetos reais, que geram resultados e fortalecem a identidade de cada marca.",
+    "stats": {
+      "projects": "projetos realizados",
+      "experience": "ano de experiência",
+      "focus": "foco em soluções reais"
+    },
+    "tools": "FERRAMENTAS QUE UTILIZO",
+    "cta": "Vamos conversar",
+    "areasLabel": "ÁREAS DE ATUAÇÃO",
+    "areas": {
+      "design": "Web Design & UI/UX",
+      "development": "Desenvolvimento Web",
+      "interactive": "Experiências Interativas"
+    }
+  },
+  "contact": {
+    "label": "CONTATO",
+    "headlineLine1": "Tem uma ideia?",
+    "headlineLine2": "Vamos criar juntos.",
+    "lead1": "Estou aberto a novos projetos, colaborações e oportunidades.",
+    "lead2": "Vamos conversar sobre como transformar sua ideia em uma experiência digital real.",
+    "cta": "Entre em contato",
+    "copy": {
+      "idle": "Copiar e-mail",
+      "copied": "Copiado ✓",
+      "error": "Copie manualmente",
+      "announceCopied": "E-mail copiado.",
+      "announceError": "Não foi possível copiar o e-mail. Ele continua visível ao lado para copiar manualmente."
+    },
+    "copyright": "© 2026 — RD PORTFÓLIO",
+    "whatsappMessage": "Olá! Encontrei seu portfólio e gostaria de conversar sobre um projeto."
+  }
+}

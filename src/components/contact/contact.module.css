@@ -1,0 +1,555 @@
+/*
+ * Seção Contato — frame "Contato" do Figma (node 30:106, 1440 × 781).
+ *
+ * ≥ 1024px: a seção mantém a proporção do frame e tudo escala junto.
+ *   --u = 1px do Figma (100cqw / 1440); medidas = "valor do Figma × --u".
+ *   A navbar é global e fixa: a faixa dela no frame (y 0–121) não faz parte
+ *   da seção, então os "top" abaixo são "y do Figma − 121" (frame de 660px).
+ *
+ * Última seção: tem no mínimo a altura da tela, com o conteúdo alinhado à
+ * base (rodapé no fim da página), para que no fim do scroll ela fique sob a
+ * navbar — que então assume o tema claro, como no Figma.
+ * < 1024px: layout em fluxo, sem redesenho (ver final do arquivo).
+ */
+.section {
+  position: relative;
+  /*
+   * Sem aspect-ratio: com min-height ele transferiria o mínimo para a largura.
+   * Altura = maior entre a tela e o frame (660px do Figma na largura da tela).
+   */
+  min-height: max(100svh, calc(660 / 1440 * 100vw));
+  overflow: hidden;
+  container-type: inline-size;
+  background: #fafaf8;
+  color: #181818;
+
+  --u: calc(100cqw / 1440);
+}
+
+/* Quadro do frame (sem a faixa da navbar), alinhado à base da seção. */
+.frame {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(660 * var(--u));
+}
+
+/* ---------- Brilho rosa (nodes 33:2 e 33:3) ---------- */
+
+/*
+ * Camadas decorativas, atrás do conteúdo e sem receber cliques. Brilho e arco
+ * passam da borda direita do frame e são recortados pela seção. Ficam
+ * ancorados pela direita (posição do Figma medida a partir da borda). As
+ * caixas internas existem para cada animação ter o próprio elemento (ver
+ * ContactGlow.tsx); sem animação, a composição é a do Figma.
+ */
+.glowLayer {
+  --glow-boost: 0;
+  --ring-color: #d6959e;
+
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Centro do brilho (x 1420, y 182 + 310), para o hover expandir a partir dele. */
+  transform-origin: calc(100% - 20 * var(--u)) calc(371 * var(--u));
+}
+
+/* Círculo de 420px desfocado; o vetor tem 100px de margem para o desfoque. */
+.glowBox {
+  position: absolute;
+  top: calc(61 * var(--u)); /* y 182 */
+  right: calc(-290 * var(--u));
+  width: calc(620 * var(--u));
+  height: calc(620 * var(--u));
+}
+
+.glowDrift,
+.glowBreath {
+  position: absolute;
+  inset: 0;
+}
+
+.glow,
+.arc {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+/*
+ * Tom pêssego (ligação com o pôr do sol do Hero): o mesmo círculo desfocado,
+ * desenhado com um degradê radial (sem filtro). Fica invisível; a animação
+ * só varia a opacidade dele por cima do rosa.
+ */
+.glowPeach {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(247 192 152 / 0.87) 0%,
+    rgb(247 192 152 / 0.87) 50%,
+    rgb(247 192 152 / 0.45) 68%,
+    rgb(247 192 152 / 0) 100%
+  );
+  opacity: 0;
+}
+
+/*
+ * Hover do CTA (hoverEngine.ts): luz laranja → rosa extra por cima do
+ * brilho, que respira junto com ele. Invisível em repouso (--glow-boost 0).
+ */
+.glowBoost {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(219 95 113 / 0.55) 0%,
+    rgb(252 147 87 / 0.4) 45%,
+    rgb(252 147 87 / 0) 100%
+  );
+  opacity: var(--glow-boost);
+}
+
+.arcBox {
+  position: absolute;
+  top: calc(101 * var(--u)); /* y 222 */
+  right: calc(-220 * var(--u));
+  width: calc(480 * var(--u));
+  height: calc(480 * var(--u));
+}
+
+/* Anéis finos no centro do arco: invisíveis fora da animação. */
+.ring {
+  --ring: calc(330 * var(--u));
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--ring);
+  height: var(--ring);
+  margin: calc(var(--ring) / -2) 0 0 calc(var(--ring) / -2);
+  border: 1px solid var(--ring-color);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* ---------- Índice (node 33:4) ---------- */
+
+.index {
+  position: absolute;
+  top: calc(76 * var(--u)); /* y 197 */
+  left: calc(80 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(14 * var(--u));
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.indexLine {
+  width: calc(55 * var(--u));
+  height: 1px;
+  background: #181818;
+  transform-origin: left; /* desenhada da esquerda para a direita */
+}
+
+.indexLabel {
+  letter-spacing: calc(0.84 * var(--u));
+  color: #555;
+}
+
+/* ---------- Headline (node 33:9) ---------- */
+
+.headline {
+  position: absolute;
+  top: calc(121 * var(--u)); /* y 242 */
+  left: calc(80 * var(--u));
+  margin: 0;
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 800;
+  font-size: calc(84 * var(--u));
+  line-height: calc(90 * var(--u));
+  letter-spacing: calc(-2.52 * var(--u));
+  white-space: nowrap;
+}
+
+.headline > span {
+  display: block;
+  width: fit-content;
+}
+
+/*
+ * Máscara de cada linha (o texto sobe de dentro dela na entrada). O espaço
+ * extra embaixo (compensado na margem) não corta as descendentes ("j").
+ */
+.headlineMask {
+  overflow: hidden;
+  padding-bottom: 0.25em;
+  margin-bottom: -0.25em;
+}
+
+.headlineLine {
+  display: block;
+}
+
+/*
+ * "Vamos criar juntos.": gradiente de #686868 a #cbcbcb. O padding inferior
+ * (compensado na margem) inclui as descendentes ("j") na área pintada.
+ */
+.headlineMuted {
+  padding-bottom: 0.25em;
+  margin-bottom: -0.25em;
+  background-image: linear-gradient(to right, #686868, #cbcbcb 87.007%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Texto (node 33:12) ---------- */
+
+.lead {
+  position: absolute;
+  top: calc(321 * var(--u)); /* y 442 */
+  left: calc(80 * var(--u));
+  width: calc(820 * var(--u));
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(18 * var(--u));
+  line-height: calc(28 * var(--u));
+  color: #555;
+}
+
+.lead > span {
+  display: block;
+}
+
+/* ---------- Divisórias (nodes 33:13 e 33:18) ---------- */
+
+.rule {
+  position: absolute;
+  left: calc(80 * var(--u));
+  width: calc(1280 * var(--u));
+  height: 1px;
+  background: #d5d5d5;
+  transform-origin: left; /* desenhadas da esquerda para a direita */
+}
+
+.ruleTop {
+  top: calc(406 * var(--u)); /* y 527 */
+}
+
+.ruleBottom {
+  top: calc(521 * var(--u)); /* y 642 */
+}
+
+/* Destaque rosa da linha inferior no hover do CTA (cresce da esquerda). */
+.ruleFill {
+  position: absolute;
+  inset: 0;
+  background: var(--sunset-rose);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ---------- CTA "Entre em contato ↗" (node 31:193) ---------- */
+
+.cta {
+  position: absolute;
+  top: calc(421 * var(--u)); /* y 542 */
+  left: calc(80 * var(--u));
+  display: flex;
+  align-items: flex-start;
+  gap: calc(13 * var(--u));
+  color: #181818;
+  white-space: nowrap;
+}
+
+/* Camada interna do CTA: só ela se desloca no hover (o link não sai do lugar). */
+.ctaInner {
+  display: flex;
+  align-items: inherit;
+  gap: inherit;
+}
+
+.ctaLabel {
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 600;
+  font-size: calc(42 * var(--u));
+  line-height: normal;
+}
+
+/* Máscara do texto do CTA (entrada). */
+.ctaMask,
+.ctaText {
+  display: block;
+}
+
+.ctaMask {
+  overflow: hidden;
+}
+
+/* Seta 20px abaixo do topo do texto, como no Figma (y 562 × 542). */
+.ctaArrow {
+  padding-top: calc(20 * var(--u));
+  font-weight: 400;
+  font-size: calc(26 * var(--u));
+  line-height: normal;
+  color: #000;
+}
+
+/* ---------- E-mail (node 33:15) ---------- */
+
+.emailRow {
+  position: absolute;
+  top: calc(484 * var(--u)); /* y 605 */
+  left: calc(80 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(28 * var(--u));
+  white-space: nowrap;
+}
+
+.email {
+  font-weight: 500;
+  font-size: calc(18 * var(--u));
+  line-height: normal;
+  color: #555;
+}
+
+.copy {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 400;
+  font-size: calc(15 * var(--u));
+  line-height: normal;
+  color: #d6959e;
+  cursor: pointer;
+  transition: color var(--hover-duration) var(--hover-ease);
+}
+
+/*
+ * Em repouso, o sublinhado é o da fonte (com os vãos nas descendentes),
+ * exatamente como no Figma. Durante o hover (texto rolando), um elemento
+ * na mesma posição o substitui, retrai para a direita e se redesenha
+ * (--line, hoverEngine.ts) — o text-decoration não alcança o texto que rola.
+ */
+.copy {
+  position: relative;
+}
+
+.copyLabel {
+  display: inline-block;
+}
+
+.copyText {
+  text-decoration: underline;
+  text-decoration-thickness: from-font;
+  text-underline-position: from-font;
+}
+
+.copyLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Medido contra o sublinhado nativo do Inter (from-font) de 1366 a 1920px. */
+  top: calc(100% - 0.08em);
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  transform: scaleX(var(--line, 1));
+  transform-origin: var(--line-origin, left);
+}
+
+.copy:has([data-rolling]) .copyLine {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .copy:hover {
+    color: color-mix(in srgb, var(--sunset-rose) 45%, var(--sunset-pink));
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Rodapé (node 35:210) ---------- */
+
+.footer {
+  position: absolute;
+  top: calc(581 * var(--u)); /* y 702 */
+  left: calc(80 * var(--u));
+  width: calc(1280 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copyright {
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(14 * var(--u));
+  line-height: normal;
+  color: #8a8a8a;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: calc(19 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Círculo de 44px: borda 1px #afafaf + 10px de respiro + ícone de 22px. */
+.social {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  padding: calc(10 * var(--u));
+  border: 1px solid #afafaf;
+  border-radius: calc(30 * var(--u));
+  transition:
+    border-color var(--hover-duration) var(--hover-ease),
+    opacity var(--hover-duration) var(--hover-ease);
+}
+
+.social img {
+  display: block;
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+/* Hover (hoverEngine.ts): disco laranja → rosa por dentro da borda. */
+.socialFill {
+  inset: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .social:hover {
+    border-color: var(--sunset-pink);
+  }
+
+  /* Foco no ícone sob o cursor: os irmãos recuam um pouco. */
+  .socials:has(.social:hover) .social:not(:hover) {
+    opacity: var(--hover-sibling-opacity);
+  }
+}
+
+/* ---------- < 1024px: fluxo simples, mesma identidade (sem redesenho) ---------- */
+
+@media (max-width: 1023.98px) {
+  .section {
+    --u: 1px;
+
+    padding: 48px 24px 40px;
+  }
+
+  .frame {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 24px;
+    height: auto;
+    min-height: calc(100svh - 88px);
+  }
+
+  .index,
+  .headline,
+  .lead,
+  .rule,
+  .cta,
+  .emailRow,
+  .footer {
+    position: relative;
+    top: auto;
+    left: auto;
+  }
+
+  /* Texto à frente do brilho, que fica no canto direito. */
+  .index,
+  .headline,
+  .lead,
+  .cta,
+  .emailRow,
+  .footer {
+    z-index: 1;
+  }
+
+  .headline {
+    font-size: clamp(40px, 10cqw, 84px);
+    line-height: 1.07;
+    letter-spacing: -0.03em;
+    white-space: normal;
+  }
+
+  .lead {
+    width: auto;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .lead > span {
+    display: inline;
+  }
+
+  .rule {
+    width: 100%;
+  }
+
+  .ctaLabel {
+    font-size: clamp(28px, 7cqw, 42px);
+  }
+
+  .ctaArrow {
+    padding-top: 0.4em;
+    font-size: clamp(18px, 4.3cqw, 26px);
+  }
+
+  .emailRow {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .footer {
+    width: auto;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .glowBox {
+    top: 80px;
+    right: -360px;
+  }
+
+  .glow {
+    opacity: 0.6;
+  }
+
+  .arcBox {
+    top: 120px;
+    right: -300px;
+  }
+
+  .arc {
+    opacity: 0.6;
+  }
+}

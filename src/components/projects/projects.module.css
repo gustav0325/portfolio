@@ -1,0 +1,591 @@
+/*
+ * Seção Projetos — frame "Projetos" do Figma (node 13:11, 1440 × 1360).
+ *
+ * ≥ 1024px: a seção mantém as medidas do frame e tudo escala junto.
+ *   --u = 1px do Figma (100cqw / 1440); medidas = "valor do Figma × --u".
+ *   A navbar é global e fixa: a faixa dela no frame (y 0–121) não faz parte
+ *   da seção, então os "top" abaixo são "y do Figma − 121" e a seção tem
+ *   1360 − 121 = 1239px. A compensação da navbar é o scroll-padding global.
+ *   Animação: o palco (.pinStage, uma tela de altura) fica preso (sticky)
+ *   dentro de .pinSpacer, com a imagem do card 01 a --pin-media-top do topo
+ *   da tela (enquadramento de referência). Dentro dele, a coluna com os três
+ *   projetos (.column) sobe. O card 01 continua exatamente em y 522 do frame:
+ *   o palco começa mais acima para compensar.
+ * < 1024px: layout em fluxo, sem redesenho (ver final do arquivo).
+ */
+/*
+ * Sobe por cima do Hero no fim do parallax: fica acima dele, com os cantos
+ * superiores arredondados e uma pequena sobreposição.
+ */
+.section {
+  position: relative;
+  z-index: 1;
+  margin-top: -40px;
+  border-radius: 40px 40px 0 0;
+  /*
+   * Topo da imagem no pin: base da navbar + vão (PROJECT_PIN; negativo = por
+   * trás da navbar), na escala da navbar (min(--u, 1px)). Valores vêm de
+   * ProjectsScene (--pin-nav, --pin-gap, --pin-indicator-shift).
+   */
+  --pin-media-top: calc((var(--pin-nav, 94) + var(--pin-gap, -35)) * min(var(--u), 1px));
+  /*
+   * O palco começa onde a imagem do card 01 (y 522 + 4 do frame) fica a
+   * --pin-media-top do topo dele: o pin começa sem nenhum salto.
+   */
+  padding-top: calc(405 * var(--u) - var(--pin-media-top));
+  /* clip (e não hidden) recorta sem virar contêiner de scroll: o sticky funciona. */
+  overflow: clip;
+  container-type: inline-size;
+  background: #fff;
+  color: #000;
+
+  --u: calc(100cqw / 1440);
+}
+
+/* ---------- Cabeçalho (node 24:31) ---------- */
+
+/* Largura alinhada às margens do site (80px de cada lado; no frame, 1299px). */
+.header {
+  position: absolute;
+  top: calc(107 * var(--u)); /* y 228 */
+  left: calc(80 * var(--u));
+  width: calc(1280 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headingGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(25 * var(--u));
+  width: calc(524 * var(--u));
+}
+
+.index {
+  display: flex;
+  align-items: center;
+  gap: calc(11 * var(--u));
+  margin: 0;
+  font-weight: 500;
+  font-size: calc(18 * var(--u));
+  line-height: normal;
+}
+
+.index > img {
+  width: calc(126 * var(--u));
+  height: 1px;
+  max-width: none;
+}
+
+/* "Projetos Selecionados": Manrope ExtraBold, gradiente do preto (esquerda) ao cinza. */
+.heading {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 800;
+  font-size: calc(68 * var(--u));
+  line-height: normal;
+}
+
+/* Cada linha é uma máscara para a entrada (o texto sobe de dentro dela). */
+.headingLine {
+  display: block;
+  overflow: hidden;
+}
+
+/*
+ * O gradiente fica em cada linha (com a largura do título, o mesmo desenho
+ * de antes): assim a linha pode se mover sem perder o recorte do texto.
+ */
+.headingText {
+  display: block;
+  background-image: linear-gradient(to left, #8c8c8c 39.423%, #000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lead {
+  width: calc(309 * var(--u));
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(18 * var(--u));
+  line-height: normal;
+  color: #4c4c4c;
+}
+
+/* ---------- Palco dos projetos (node 35:243) ---------- */
+
+/*
+ * Espaço do pin: o palco + o trecho de scroll em que ele fica preso (o papel
+ * do pinSpacing). A altura exata é calculada pela animação a partir do DOM;
+ * este valor só vale antes dela.
+ */
+.pinSpacer {
+  position: relative;
+  height: 340svh;
+}
+
+/* Palco preso: uma tela de altura no topo, com o indicador fixo. */
+.pinStage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: clip;
+}
+
+/* Janela onde a coluna aparece (o recorte é do palco). */
+.window {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * Coluna com os três projetos, um abaixo do outro. Começa com o card 01 no
+ * enquadramento do pin; a animação a sobe com translateY.
+ */
+.column {
+  padding-top: calc(var(--pin-media-top) - 4 * var(--u));
+  padding-bottom: calc(48 * var(--u));
+  will-change: transform;
+}
+
+/* Cada projeto: imagem + informações, um bloco vertical (medidas do frame). */
+.card {
+  position: relative;
+  padding-top: calc(4 * var(--u));
+}
+
+/* Vão editorial entre os projetos. */
+.card + .card {
+  margin-top: calc(140 * var(--u));
+}
+
+/* Mídia (node 26:38): fundo escurecido + "tela" com cantos arredondados. */
+.media {
+  position: relative;
+  width: calc(1167 * var(--u));
+  height: calc(649 * var(--u));
+  margin-left: calc(189 * var(--u));
+  overflow: hidden;
+  background: #000;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+/* Tela 976×449 em (96, 100) dentro da mídia de 1167×649. */
+.screen {
+  position: absolute;
+  left: calc(96 / 1167 * 100%);
+  top: calc(100 / 649 * 100%);
+  width: calc(976 / 1167 * 100%);
+  height: calc(449 / 649 * 100%);
+  overflow: hidden;
+  border-radius: calc(35 * var(--u));
+  container-type: size;
+}
+
+/*
+ * Print: largura da tela e a altura da imagem (nunca menor que a tela). Se
+ * for mais alto que a tela, a animação o rola para cima; com a mesma
+ * proporção da tela (prints atuais), fica igual a um "cover".
+ */
+.shot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: max(100cqh, calc(100cqw * var(--shot-ratio)));
+}
+
+/* Informações (node 35:214): título + descrição e tags, 25px abaixo da mídia. */
+.info {
+  position: relative;
+  width: calc(1167 * var(--u));
+  margin: calc(25 * var(--u)) 0 0 calc(189 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(13 * var(--u));
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin: 0;
+  font-weight: 700;
+  font-size: calc(26 * var(--u));
+  line-height: normal;
+  white-space: nowrap;
+}
+
+/* Máscara do título: o texto sobe de dentro dela na entrada. */
+.titleMask {
+  display: block;
+  overflow: hidden;
+}
+
+.titleText {
+  display: block;
+}
+
+.titleLink {
+  position: relative;
+  display: inherit;
+  align-items: inherit;
+  gap: inherit;
+  color: inherit;
+}
+
+/*
+ * Sublinhado rosa do título com link (título + seta): escondido em repouso;
+ * no hover se desenha da esquerda e recolhe para a direita (--draw e
+ * --draw-origin, hoverEngine.ts). Em em, para acompanhar o título.
+ */
+.titleLine {
+  position: absolute;
+  right: 0;
+  bottom: -0.15em;
+  left: 0;
+  height: max(1px, 0.06em);
+  background: var(--sunset-rose);
+  transform: scaleX(var(--draw, 0));
+  transform-origin: var(--draw-origin, left);
+  pointer-events: none;
+}
+
+/* Teclado: o mesmo destaque do hover (sem movimento). */
+.titleLink:focus-visible .titleLine {
+  transform: scaleX(1);
+}
+
+/* Movimento reduzido: o sublinhado aparece, sem crescer. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .titleLink:hover .titleLine {
+    transform: scaleX(1);
+  }
+}
+
+/* Seta ↗: vetor 16×14 girado −43° numa caixa de 21,25×21,15 (node 26:54). */
+.arrow {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(21.25 * var(--u));
+  height: calc(21.15 * var(--u));
+}
+
+.arrow img {
+  width: calc(18 * var(--u));
+  height: calc(16 * var(--u));
+  max-width: none;
+  rotate: -43deg;
+}
+
+/* Seta com hover (título com link): ocupa a caixa da seta, centrada como a original. */
+.arrowRoll {
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.description {
+  width: calc(702 * var(--u));
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(20 * var(--u));
+  line-height: normal;
+}
+
+.tags {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(4 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(10 * var(--u)) calc(15 * var(--u));
+  border: 1px solid #000;
+  border-radius: calc(25 * var(--u));
+  font-weight: 400;
+  font-size: calc(20 * var(--u));
+  line-height: normal;
+  white-space: nowrap;
+}
+
+/* Ano: pill preenchida. */
+.year {
+  background: #000;
+  color: #fff;
+}
+
+/* ---------- Indicador lateral (node 44:2) ---------- */
+
+/*
+ * Fixo no palco, na mesma posição em relação ao card 01 que no frame (149px
+ * abaixo do topo do palco do frame = 145 abaixo da imagem), mais o ajuste
+ * fino PROJECT_PIN.indicatorShift.
+ */
+.indicator {
+  position: absolute;
+  top: calc(
+    var(--pin-media-top) + 145 * var(--u) + var(--pin-indicator-shift, 0) * min(var(--u), 1px)
+  );
+  left: calc(63 * var(--u));
+  width: calc(79 * var(--u));
+  height: calc(358 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  position: absolute;
+  max-width: none;
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+/* Cada item tem as duas bolinhas; a troca é um cross-fade com leve escala. */
+li[data-active="true"] > .dotIdle,
+li[data-active="false"] > .dotActive {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+/* Número centralizado verticalmente na bolinha, alinhado à esquerda em x 49. */
+.number {
+  position: absolute;
+  left: calc(49 * var(--u));
+  display: flex;
+  align-items: center;
+  height: calc(35 * var(--u));
+  font-weight: 500;
+  font-size: calc(16 * var(--u));
+  line-height: normal;
+  color: #d9d9d9;
+  transition:
+    font-size 300ms ease,
+    color 300ms ease;
+}
+
+li[data-active="true"] > .number {
+  font-size: calc(26 * var(--u));
+  color: #000;
+}
+
+.track,
+.progress {
+  position: absolute;
+  transition:
+    top 300ms ease,
+    height 300ms ease;
+}
+
+.track {
+  left: calc(17 * var(--u));
+  width: max(1px, calc(1 * var(--u)));
+  background: #d9d9d9;
+}
+
+/* Trecho preenchido: altura do trilho, revelado de cima por scaleY. */
+.progress {
+  left: calc(16.5 * var(--u));
+  width: calc(2 * var(--u));
+  border-radius: calc(1 * var(--u));
+  background: #000;
+  transform-origin: top;
+}
+
+/* ---------- < 1024px: fluxo simples, mesma identidade (sem redesenho) ---------- */
+
+@media (max-width: 1023.98px) {
+  .section {
+    margin-top: -24px;
+    border-radius: 24px 24px 0 0;
+    padding: 48px 24px 64px;
+  }
+
+  .header {
+    position: static;
+    width: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .headingGroup {
+    width: auto;
+    gap: 16px;
+  }
+
+  .index {
+    gap: 11px;
+    font-size: 16px;
+  }
+
+  .index > img {
+    width: 96px;
+  }
+
+  .heading {
+    font-size: clamp(40px, 9cqw, 68px);
+  }
+
+  .lead {
+    width: auto;
+    max-width: 309px;
+    font-size: 16px;
+  }
+
+  /* Sem pin: os três projetos em sequência, no fluxo. */
+  .pinSpacer {
+    height: auto;
+  }
+
+  .pinStage {
+    position: relative;
+    height: auto;
+    margin-top: 40px;
+    overflow: visible;
+  }
+
+  .window {
+    position: static;
+  }
+
+  .column {
+    padding: 0;
+    will-change: auto;
+  }
+
+  .indicator {
+    display: none;
+  }
+
+  .card {
+    padding-top: 0;
+  }
+
+  .card + .card {
+    margin-top: 56px;
+  }
+
+  .media {
+    width: 100%;
+    margin-left: 0;
+    height: auto;
+    aspect-ratio: 1167 / 649;
+  }
+
+  .screen {
+    border-radius: clamp(12px, 3cqw, 35px);
+  }
+
+  .info {
+    width: auto;
+    margin: 20px 0 0;
+    gap: 12px;
+  }
+
+  .title {
+    gap: 8px;
+    font-size: 20px;
+    white-space: normal;
+  }
+
+  .arrow {
+    width: 18px;
+    height: 18px;
+  }
+
+  .arrow img {
+    width: 15px;
+    height: 13px;
+  }
+
+  .details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .description {
+    width: auto;
+    font-size: 16px;
+  }
+
+  .tags {
+    gap: 4px;
+  }
+
+  .tag {
+    padding: 8px 12px;
+    border-radius: 25px;
+    font-size: 14px;
+  }
+}
+
+/*
+ * ---------- Movimento reduzido (≥ 1024px) ----------
+ * Sem pin nem coluna animada: os três projetos em fluxo, um abaixo do outro.
+ * O primeiro fica exatamente onde está no Figma.
+ */
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .section {
+    padding-top: calc(401 * var(--u));
+    padding-bottom: calc(80 * var(--u));
+  }
+
+  .pinSpacer {
+    height: auto;
+  }
+
+  .pinStage {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+
+  .window {
+    position: static;
+  }
+
+  .column {
+    padding: 0;
+    will-change: auto;
+  }
+
+  .indicator {
+    top: calc(149 * var(--u));
+  }
+}
