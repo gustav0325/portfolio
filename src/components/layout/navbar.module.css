@@ -333,28 +333,6 @@
   outline-offset: -2px;
 }
 
-/* Menu mobile: as duas siglas lado a lado (sem dropdown). */
-.langChoices {
-  display: flex;
-  gap: calc(8 * var(--u));
-}
-
-.langChoice {
-  padding: calc(6 * var(--u)) calc(12 * var(--u));
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  font-weight: 500;
-  font-size: calc(17 * var(--u));
-  line-height: normal;
-  opacity: 0.55;
-}
-
-.langChoice[aria-pressed="true"] {
-  opacity: 1;
-}
-
 /* ---------- Telas menores ---------- */
 
 @media (max-width: 1023.98px) {

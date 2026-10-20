@@ -193,7 +193,7 @@ export function LanguageSwitcher({ className, container }: { className?: string;
   );
 }
 
-/** No menu mobile: as duas opções lado a lado, sem dropdown. */
+/** No menu mobile: as duas opções lado a lado, sem dropdown (estilo de quem usa, via className). */
 export function LanguageChoice({ className }: { className?: string }) {
   const { locale, setLocale, messages } = useI18n();
   return (
@@ -205,7 +205,6 @@ export function LanguageChoice({ className }: { className?: string }) {
           lang={option}
           aria-pressed={option === locale}
           aria-label={messages.nav.languageName[option]}
-          className={styles.langChoice}
           onClick={() => setLocale(option)}
         >
           {LOCALE_SHORT[option]}

@@ -568,10 +568,89 @@
     white-space: normal;
   }
 
-  .stats,
+  /*
+   * Indicadores: três colunas iguais, número e legenda centrados em cada uma;
+   * a legenda quebra dentro da própria coluna. O divisor fica no meio do vão
+   * entre as colunas, com a altura do bloco (e a mesma animação --divider).
+   */
+  .stats {
+    --stats-gap: clamp(10px, 3.5cqw, 24px);
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    column-gap: var(--stats-gap);
+    width: 100%;
+  }
+
+  .stat {
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .stat + .stat {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  .stat + .stat::before {
+    top: 4px;
+    bottom: 4px;
+    left: calc(var(--stats-gap) / -2);
+    height: auto;
+  }
+
+  .statValue {
+    font-size: clamp(26px, 8.5cqw, 32px);
+  }
+
+  .statLabel {
+    font-size: clamp(12.5px, 3.6cqw, 14px);
+    line-height: 1.35;
+  }
+
+  /*
+   * Ferramentas: o ponto separador fica no vão antes de cada item (a partir
+   * do 2º). Quando um item começa uma linha, o ponto dele cai fora do quadro
+   * (recortado por .tools) — nunca sobra um ponto sozinho no começo ou no fim
+   * de uma linha. A quebra depois de REACT forma duas linhas equilibradas:
+   * FIGMA • JAVASCRIPT • REACT / IA • PYTHON (se não couber, quebra antes).
+   */
+  .tools {
+    --tool-gap: 28px;
+
+    width: 100%;
+    overflow-x: clip;
+  }
+
   .toolList {
     flex-wrap: wrap;
-    row-gap: 16px;
+    gap: 0;
+    margin-left: calc(var(--tool-gap) * -1);
+  }
+
+  .toolList::after {
+    content: "";
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .tool {
+    position: relative;
+    padding: 6px 0 6px var(--tool-gap);
+  }
+
+  .tool:nth-child(n + 4) {
+    order: 2;
+  }
+
+  .tool > img {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--tool-gap) / 2);
+    translate: -50% -50%;
   }
 
   .footerRule {

@@ -1,0 +1,177 @@
+/*
+ * Menu em tela cheia do celular (MobileMenu.tsx). Fica dentro da navbar fixa
+ * (que é o bloco de referência dele) e acima da barra. Ocupa a altura visível
+ * (100dvh, acompanha as barras do navegador), respeita as áreas seguras e
+ * rola por dentro se a tela for baixa. Invisível até o GSAP abrir.
+ */
+.menu {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(24px, env(safe-area-inset-right))
+    max(28px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+  color: #fefefe;
+  /* Fundo escuro do site, com o rosa do pôr do sol bem de leve à direita. */
+  background:
+    radial-gradient(70% 45% at 100% 55%, rgb(214 149 158 / 0.08), transparent 70%),
+    #121113;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: auto;
+}
+
+@media (max-width: 1023.98px) {
+  .menu {
+    display: flex;
+  }
+}
+
+/* Logo e X nos mesmos lugares do logo e do ☰ da barra (que fica por baixo). */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  height: 52px;
+  /* Barra mobile: logo a 32px da borda, ☰ centrado a 40px da direita. */
+  margin: 0 -6px 0 8px;
+}
+
+.logo {
+  display: block;
+  width: 45px;
+  height: 32px;
+}
+
+.close {
+  display: inline-flex;
+  padding: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+}
+
+/* ---------- Links ---------- */
+
+.links {
+  margin: clamp(28px, 7dvh, 64px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: grid;
+  grid-template-columns: 2.6em 1fr auto;
+  align-items: center;
+  padding: clamp(16px, 3.2dvh, 26px) 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  color: inherit;
+}
+
+.number {
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: #8a8a8a;
+}
+
+.label {
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 600;
+  font-size: clamp(30px, 9.5vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.arrow {
+  font-size: clamp(20px, 5.5vw, 26px);
+  color: var(--sunset-rose);
+}
+
+/* ---------- Idioma e redes ---------- */
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 6dvh, 56px);
+  margin-top: clamp(28px, 6dvh, 56px);
+  padding-bottom: 4px;
+}
+
+.language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.languageLabel {
+  font-size: 16px;
+  color: #8a8a8a;
+}
+
+.languageChoice {
+  display: flex;
+  gap: 10px;
+}
+
+/* PT / EN: pílulas; a ativa em branco, a outra recuada. */
+.languageChoice button {
+  min-width: 64px;
+  padding: 9px 18px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(255 255 255 / 0.55);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  opacity: 1;
+}
+
+.languageChoice button[aria-pressed="true"] {
+  border-color: #fefefe;
+  color: #fefefe;
+}
+
+.socials {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.07);
+}
+
+.social img {
+  display: block;
+  width: 22px;
+  height: auto;
+}
+
+/* Foco por teclado visível sobre o fundo escuro. */
+.menu :focus-visible {
+  outline: 2px solid #fefefe;
+  outline-offset: 3px;
+}

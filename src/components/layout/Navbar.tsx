@@ -1,13 +1,13 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { Menu } from "lucide-react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { navLinks } from "@/config/site";
 import type { Locale } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
-import { LanguageChoice, LanguageSwitcher } from "./LanguageSwitcher";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import LogoRD from "./LogoRD";
+import MobileMenu from "./MobileMenu";
 import styles from "./navbar.module.css";
 import { useActiveIndicator, type IndicatorLine } from "./useActiveIndicator";
 import { useHoverPill } from "./useHoverPill";
@@ -78,6 +78,7 @@ export default function Navbar() {
   useActiveIndicator(linksRef, indicatorRef, activeHref, ACTIVE_LINES[locale]);
   useHoverPill(linksRef, pillRef);
   const menuId = useId();
+  const closeMenu = useCallback(() => setOpen(false), []);
   const barClass = [
     styles.bar,
     theme === "light" && styles.light,
@@ -128,22 +129,6 @@ export default function Navbar() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const toggle = toggleRef.current;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    const { overflow } = document.body.style;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = overflow;
-      window.removeEventListener("keydown", onKey);
-      toggle?.focus();
-    };
-  }, [open]);
-
   return (
     <div ref={setShell} className={styles.shell} data-theme={theme}>
       <header
@@ -189,39 +174,10 @@ export default function Navbar() {
         >
           <Menu size={24} strokeWidth={1.75} aria-hidden />
         </button>
-
-        {open &&
-          createPortal(
-            <div
-              id={menuId}
-              role="dialog"
-              aria-modal="true"
-              aria-label={nav.menu}
-              className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-10 bg-background/90 text-foreground backdrop-blur-md"
-            >
-              <button
-                type="button"
-                className="absolute top-5 right-5 p-1"
-                aria-label={nav.closeMenu}
-                onClick={() => setOpen(false)}
-                autoFocus
-              >
-                <X size={28} strokeWidth={1.75} aria-hidden />
-              </button>
-              <ul className="flex flex-col items-center gap-8 text-2xl font-medium">
-                {navLinks.map((link) => (
-                  <li key={link.href}>
-                    <a href={link.href} onClick={() => setOpen(false)}>
-                      {nav[link.key]}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <LanguageChoice className={`${styles.langChoices} [--u:1.2px]`} />
-            </div>,
-            document.body,
-          )}
       </header>
+
+      {/* Menu em tela cheia do celular: acima da barra, dentro da navbar fixa. */}
+      <MobileMenu id={menuId} open={open} onClose={closeMenu} toggleRef={toggleRef} />
     </div>
   );
 }
